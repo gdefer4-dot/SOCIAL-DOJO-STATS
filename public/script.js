@@ -186,9 +186,9 @@ animateCounter(followers);
       minute: "2-digit"
     });
 
-    const history = saveHistory(followers);
-    displayDelta("todayDelta", calculateDelta(history, 1));
-    displayDelta("weekDelta", calculateDelta(history, 7));
+   const history = Array.isArray(data.history) ? data.history : [];
+displayDelta("todayDelta", Number(data.today || 0));
+displayDelta("weekDelta", Number(data.week || 0));
 
     const percent = Math.min(Math.round((followers / GOAL) * 100), 100);
     $("goalPercent").textContent = `${percent}%`;
