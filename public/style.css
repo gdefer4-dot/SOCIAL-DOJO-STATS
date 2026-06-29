@@ -39,8 +39,8 @@ body::before {
   height: 100vh;
   padding: 18px;
   display: grid;
-  grid-template-rows: 100px 430px 1fr 26px;
-  gap: 16px;
+  grid-template-rows: 100px 445px 1fr 26px;
+  gap: 14px;
 }
 
 .topbar, .hero, .chart-card {
@@ -55,7 +55,7 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 26px;
+  padding: 14px 26px;
 }
 
 .brand {
@@ -113,17 +113,17 @@ body::before {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 430px;
+  min-height: 445px;
   text-align: center;
-  padding: 18px 26px;
+  padding: 14px 26px;
 }
 
 .halo {
   position: absolute;
-  width: 520px;
-  height: 520px;
+  width: 560px;
+  height: 560px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(34,144,255,.22), transparent 63%);
+  background: radial-gradient(circle, rgba(34,144,255,.24), transparent 63%);
   filter: blur(10px);
   animation: pulse 5s ease-in-out infinite;
   pointer-events: none;
@@ -137,21 +137,21 @@ body::before {
   letter-spacing: .18em;
   font-weight: 900;
   font-size: 17px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .counter {
   position: relative;
   z-index: 1;
-  font-size: clamp(110px, 13vw, 195px);
+  font-size: clamp(140px, 16vw, 250px);
   font-weight: 1000;
-  line-height: 1;
-  letter-spacing: .045em;
+  line-height: .95;
+  letter-spacing: .04em;
   color: #dff0ff;
   text-shadow:
     0 0 28px rgba(34,144,255,.55),
     0 0 70px rgba(34,144,255,.25);
-  padding: 4px 0;
+  padding: 2px 0;
   overflow: visible;
 }
 
@@ -164,15 +164,15 @@ body::before {
   text-transform: uppercase;
   letter-spacing: .45em;
   font-weight: 900;
-  margin-top: 0;
+  margin-top: 2px;
 }
 
 .status {
   position: relative;
   z-index: 1;
-  margin-top: 10px;
+  margin-top: 8px;
   border-radius: 999px;
-  padding: 7px 15px;
+  padding: 6px 14px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: .18em;
@@ -193,8 +193,8 @@ body::before {
 
 .updated {
   color: var(--muted);
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 5px;
+  font-size: 12px;
 }
 
 .stats-row {
@@ -204,28 +204,28 @@ body::before {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .stats-row article {
   background: var(--panel2);
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 18px;
-  padding: 10px;
+  padding: 8px;
 }
 
 .stats-row span {
   display: block;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   text-transform: uppercase;
   letter-spacing: .14em;
 }
 
 .stats-row strong {
   display: block;
-  margin-top: 3px;
-  font-size: 22px;
+  margin-top: 2px;
+  font-size: 18px;
   color: var(--blue);
 }
 
@@ -233,11 +233,11 @@ body::before {
   position: relative;
   z-index: 1;
   width: min(980px, 90%);
-  height: 7px;
+  height: 6px;
   background: rgba(255,255,255,.1);
   border-radius: 999px;
   overflow: hidden;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .goal div {
@@ -249,7 +249,7 @@ body::before {
 }
 
 .chart-card {
-  padding: 18px 24px;
+  padding: 12px 20px;
   min-height: 0;
   overflow: hidden;
 }
@@ -258,7 +258,7 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: end;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .chart-title h2 {
@@ -272,7 +272,7 @@ body::before {
 
 canvas {
   width: 100%;
-  height: 155px;
+  height: 150px;
   display: block;
 }
 
