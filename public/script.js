@@ -146,7 +146,11 @@ async function fetchFacebook() {
     $("status").className = "status live";
 
     const followers = Number(data.followers);
-    animateCounter(followers);
+   if (currentValue && followers > currentValue) {
+  celebrateNewFollower(followers - currentValue);
+}
+
+animateCounter(followers);
 
     $("updatedAt").textContent = new Date(data.updatedAt).toLocaleTimeString("fr-FR", {
       hour: "2-digit",
