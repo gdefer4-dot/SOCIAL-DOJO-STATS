@@ -210,3 +210,20 @@ setClock();
 setInterval(setClock, 1000);
 fetchFacebook();
 setInterval(fetchFacebook, REFRESH_MS);
+document.addEventListener("keydown", (e) => {
+
+    if (e.key.toLowerCase() === "t") {
+
+        const ancien = currentValue;
+
+        animateCounter(currentValue + 1);
+
+        celebrateNewFollower(1);
+
+        setTimeout(() => {
+            animateCounter(ancien);
+        }, 5000);
+
+    }
+
+});
