@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compteur Facebook - Dojo Club Vieux-Condé</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="screen">
+    <header class="topbar">
+      <div class="brand">
+        <img src="/assets/logo.png" alt="Logo Dojo Club">
+        <div>
+          <h1>Dojo-club Vieux-Condé</h1>
+          <p>Compteur Facebook</p>
+        </div>
+      </div>
+      <div class="clock">
+        <strong id="time">--:--:--</strong>
+        <span id="date">Chargement...</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="halo"></div>
+      <div class="facebook-pill">● Facebook</div>
+      <div id="counter" class="counter">0</div>
+      <div class="label">abonnés</div>
+
+      <div id="status" class="status offline">● Hors ligne</div>
+      <div class="updated">Mise à jour : <span id="updatedAt">--:--</span></div>
+
+      <div class="stats-row">
+        <article>
+          <span>Aujourd'hui</span>
+          <strong id="todayDelta">+0</strong>
+        </article>
+        <article>
+          <span>Cette semaine</span>
+          <strong id="weekDelta">+0</strong>
+        </article>
+        <article>
+          <span>Objectif 7 000</span>
+          <strong id="goalPercent">0%</strong>
+        </article>
+      </div>
+
+      <div class="goal"><div id="goalBar"></div></div>
+    </section>
+
+    <section class="chart-card">
+      <div class="chart-title">
+        <h2>Évolution des abonnés</h2>
+        <span>30 derniers jours</span>
+      </div>
+      <canvas id="chart" width="1400" height="260"></canvas>
+    </section>
+
+    <footer>
+      <span>facebook.com/DojoClubVieuxConde</span>
+      <span>Actualisation automatique toutes les 5 minutes</span>
+    </footer>
+  </main>
+  <script src="/script.js"></script>
+</body>
+</html>
