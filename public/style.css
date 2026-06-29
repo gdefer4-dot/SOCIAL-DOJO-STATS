@@ -123,9 +123,9 @@ body::before {
 .counter {
   position: relative;
   z-index: 1;
-  font-size: clamp(90px, 12vw, 190px);
+  font-size: clamp(120px, 15vw, 220px);
   font-weight: 1000;
-  line-height: 1;
+  line-height: 0.9;
   letter-spacing: .06em;
   color: #dff0ff;
   text-shadow: 0 0 28px rgba(34,144,255,.55), 0 0 70px rgba(34,144,255,.25);
