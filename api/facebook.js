@@ -4,44 +4,29 @@ let redis;
 
 async function getRedis() {
   if (!redis) {
-    redis = createClient({
-      url: process.env.REDIS_URL
-    });
-
+    redis = createClient({ url: process.env.REDIS_URL });
     redis.on("error", (err) => console.error("Redis error", err));
     await redis.connect();
   }
-
   return redis;
 }
 
-function getParisDateParts(date = new Date()) {
-  const formatter = new Intl.DateTimeFormat("fr-CA", {
+function parisDateKey(date = new Date()) {
+  return new Intl.DateTimeFormat("fr-CA", {
     timeZone: "Europe/Paris",
     year: "numeric",
     month: "2-digit",
-    day: "2-digit",
-    weekday: "short"
-  });
-
-  const parts = Object.fromEntries(
-    formatter.formatToParts(date).map((p) => [p.type, p.value])
-  );
-
-  const dateKey = `${parts.year}-${parts.month}-${parts.day}`;
-  return { dateKey };
+    day: "2-digit"
+  }).format(date);
 }
 
-function getMondayKey(date = new Date()) {
-  const parisDate = new Date(
-    date.toLocaleString("en-US", { timeZone: "Europe/Paris" })
-  );
-
-  const day = parisDate.getDay();
+function mondayKey() {
+  const now = new Date();
+  const paris = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Paris" }));
+  const day = paris.getDay();
   const diff = day === 0 ? -6 : 1 - day;
-  parisDate.setDate(parisDate.getDate() + diff);
-
-  return getParisDateParts(parisDate).dateKey;
+  paris.setDate(paris.getDate() + diff);
+  return parisDateKey(paris);
 }
 
 export default async function handler(req, res) {
@@ -53,7 +38,7 @@ export default async function handler(req, res) {
   if (!pageId || !token) {
     return res.status(500).json({
       ok: false,
-      message: "FACEBOOK_PAGE_ID ou FACEBOOK_ACCESS_TOKEN manquant dans Vercel."
+      message: "FACEBOOK_PAGE_ID ou FACEBOOK_ACCESS_TOKEN manquant."
     });
   }
 
@@ -73,10 +58,10 @@ export default async function handler(req, res) {
     const followers = Number(data.followers_count ?? data.fan_count ?? 0);
     const client = await getRedis();
 
-    const { dateKey } = getParisDateParts();
-    const weekKey = getMondayKey();
+    const todayKey = parisDateKey();
+    const weekKey = mondayKey();
 
-    const todayStartKey = `facebook:start:day:${dateKey}`;
+    const todayStartKey = `facebook:start:day:${todayKey}`;
     const weekStartKey = `facebook:start:week:${weekKey}`;
     const historyKey = "facebook:history";
 
@@ -92,7 +77,7 @@ export default async function handler(req, res) {
       await client.set(weekStartKey, weekStart);
     }
 
-    await client.hSet(historyKey, dateKey, String(followers));
+    await client.hSet(historyKey, todayKey, String(followers));
 
     const rawHistory = await client.hGetAll(historyKey);
     const history = Object.entries(rawHistory)
