@@ -134,7 +134,36 @@ function drawChart(history) {
     ctx.fill();
   });
 }
+function celebrateNewFollower(gain) {
+  const toast = $("newFollowerToast");
+  const confettiLayer = $("confettiLayer");
 
+  toast.textContent = gain > 1
+    ? `🎉 ${gain} nouveaux abonnés !`
+    : "🎉 Nouvel abonné !";
+
+  toast.classList.remove("show");
+  void toast.offsetWidth;
+  toast.classList.add("show");
+
+  document.body.classList.remove("new-follower-flash");
+  void document.body.offsetWidth;
+  document.body.classList.add("new-follower-flash");
+
+  const colors = ["#2290ff", "#e5252a", "#ffffff", "#22c55e"];
+
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti";
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * .4 + "s";
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    confettiLayer.appendChild(piece);
+
+    setTimeout(() => piece.remove(), 3200);
+  }
+}
 async function fetchFacebook() {
   try {
     const response = await fetch("/api/facebook", { cache: "no-store" });
