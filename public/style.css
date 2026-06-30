@@ -502,3 +502,27 @@ body.new-follower-flash::after {
   0% { transform: translateY(0) rotate(0deg); opacity: 1; }
   100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
+.left-panel {
+  grid-column: 1 / 2;
+  grid-row: 2 / 4;
+}
+
+.main-counter {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.right-panel {
+  grid-column: 3 / 4;
+  grid-row: 2 / 4;
+}
+
+.chart-card {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+}
+
+.footer {
+  grid-column: 1 / 4;
+  grid-row: 4 / 5;
+}
