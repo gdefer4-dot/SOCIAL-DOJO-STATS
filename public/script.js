@@ -234,11 +234,14 @@ setInterval(fetchFacebook, REFRESH_MS);
 
 document.addEventListener("keydown", (e) => {
   if (e.key.toLowerCase() === "t") {
+    const realValue = currentValue;
+
     celebrateNewFollower(1);
-    animateCounter(currentValue + 1);
+    animateCounter(realValue + 1);
 
     setTimeout(() => {
-      animateCounter(currentValue);
+      currentValue = realValue;
+      animateCounter(realValue);
     }, 5000);
   }
 });
