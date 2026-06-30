@@ -1,6 +1,7 @@
 const GOAL = 7000;
 const REFRESH_MS = 5 * 60 * 1000;
 const $ = (id) => document.getElementById(id);
+
 let currentValue = 0;
 
 function formatNumber(value) {
@@ -9,48 +10,24 @@ function formatNumber(value) {
 
 function setClock() {
   const now = new Date();
+
   $("time").textContent = now.toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit"
   });
+
   $("date").textContent = now.toLocaleDateString("fr-FR", {
     weekday: "long",
     day: "2-digit",
     month: "long",
     year: "numeric"
-  });
-}
-
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem("dojoFacebookHistory") || "[]"); }
-  catch { return []; }
-}
-
-function saveHistory(value) {
-  const today = new Date().toISOString().slice(0, 10);
-  let history = getHistory();
-  const existing = history.find((item) => item.date === today);
-
-  if (existing) existing.value = value;
-  else history.push({ date: today, value });
-
-  history = history.slice(-30);
-  localStorage.setItem("dojoFacebookHistory", JSON.stringify(history));
-  return history;
-}
-
-function calculateDelta(history, days) {
-  if (history.length < 2) return 0;
-  const latest = history[history.length - 1].value;
-  const compare = history[Math.max(0, history.length - 1 - days)]?.value ?? latest;
-  return latest - compare;
+  }).toUpperCase();
 }
 
 function displayDelta(id, value) {
   const sign = value > 0 ? "+" : "";
   $(id).textContent = `${sign}${formatNumber(value)}`;
-  $(id).style.color = value >= 0 ? "var(--green)" : "var(--red)";
 }
 
 function animateCounter(target) {
@@ -62,10 +39,13 @@ function animateCounter(target) {
     const progress = Math.min((now - startedAt) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 4);
     const value = Math.round(start + (target - start) * eased);
-    $("counter").textContent = formatNumber(value);
 
-    if (progress < 1) requestAnimationFrame(step);
-    else {
+    $("counter").textContent = formatNumber(value);
+    $("totalFollowers").textContent = formatNumber(value);
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
       currentValue = target;
       $("counter").classList.remove("bump");
       void $("counter").offsetWidth;
@@ -76,33 +56,52 @@ function animateCounter(target) {
   requestAnimationFrame(step);
 }
 
+function calculateMonth(history, followers) {
+  if (!Array.isArray(history) || history.length < 2) return 0;
+
+  const now = new Date();
+  const currentMonth = now.toISOString().slice(0, 7);
+
+  const firstOfMonth = history.find(item => item.date.startsWith(currentMonth));
+  if (!firstOfMonth) return 0;
+
+  return followers - Number(firstOfMonth.value || followers);
+}
+
 function drawChart(history) {
   const canvas = $("chart");
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
+
   ctx.clearRect(0, 0, w, h);
 
-  if (history.length < 2) {
-    ctx.fillStyle = "rgba(255,255,255,.45)";
-    ctx.font = "28px sans-serif";
-    ctx.fillText("Le graphique se remplira automatiquement jour après jour.", 40, 135);
+  if (!Array.isArray(history) || history.length < 2) {
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    ctx.font = "30px sans-serif";
+    ctx.fillText("Le graphique se remplira automatiquement jour après jour.", 45, 150);
     return;
   }
 
-  const values = history.map((item) => item.value);
-  const min = Math.min(...values) - 5;
-  const max = Math.max(...values) + 5;
-  const pad = 34;
+  const values = history.map(item => Number(item.value));
+  const min = Math.min(...values) - 20;
+  const max = Math.max(...values) + 20;
+  const pad = 56;
 
   ctx.strokeStyle = "rgba(255,255,255,.08)";
   ctx.lineWidth = 1;
-  for (let i = 0; i < 5; i++) {
-    const y = pad + ((h - pad * 2) / 4) * i;
+
+  for (let i = 0; i < 6; i++) {
+    const y = pad + ((h - pad * 2) / 5) * i;
     ctx.beginPath();
     ctx.moveTo(pad, y);
     ctx.lineTo(w - pad, y);
     ctx.stroke();
+
+    const label = Math.round(max - ((max - min) / 5) * i);
+    ctx.fillStyle = "rgba(255,255,255,.75)";
+    ctx.font = "22px sans-serif";
+    ctx.fillText(formatNumber(label), 0, y + 8);
   }
 
   const points = values.map((value, i) => {
@@ -112,28 +111,48 @@ function drawChart(history) {
   });
 
   const gradient = ctx.createLinearGradient(0, 0, w, 0);
-  gradient.addColorStop(0, "#e5252a");
-  gradient.addColorStop(1, "#2290ff");
+  gradient.addColorStop(0, "#ff2638");
+  gradient.addColorStop(.45, "#b333ff");
+  gradient.addColorStop(1, "#1593ff");
 
-  ctx.shadowColor = "rgba(34,144,255,.65)";
-  ctx.shadowBlur = 16;
+  ctx.beginPath();
+  points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+  ctx.lineTo(points.at(-1).x, h - pad);
+  ctx.lineTo(points[0].x, h - pad);
+  ctx.closePath();
+
+  const fillGradient = ctx.createLinearGradient(0, pad, 0, h);
+  fillGradient.addColorStop(0, "rgba(21,147,255,.45)");
+  fillGradient.addColorStop(1, "rgba(21,147,255,0)");
+  ctx.fillStyle = fillGradient;
+  ctx.fill();
+
+  ctx.shadowColor = "rgba(21,147,255,.8)";
+  ctx.shadowBlur = 18;
   ctx.strokeStyle = gradient;
   ctx.lineWidth = 7;
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
-  ctx.beginPath();
 
+  ctx.beginPath();
   points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
   ctx.stroke();
 
   ctx.shadowBlur = 0;
-  points.forEach((p) => {
-    ctx.fillStyle = "#2290ff";
+
+  points.forEach((p, i) => {
+    ctx.fillStyle = i < points.length / 3 ? "#ff2638" : "#1593ff";
     ctx.beginPath();
     ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    ctx.fill();
   });
 }
+
 function celebrateNewFollower(gain) {
   const toast = $("newFollowerToast");
   const confettiLayer = $("confettiLayer");
@@ -150,20 +169,21 @@ function celebrateNewFollower(gain) {
   void document.body.offsetWidth;
   document.body.classList.add("new-follower-flash");
 
-  const colors = ["#2290ff", "#e5252a", "#ffffff", "#22c55e"];
+  const colors = ["#1593ff", "#ff2638", "#ffffff", "#24f57a", "#a638ff"];
 
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 80; i++) {
     const piece = document.createElement("div");
     piece.className = "confetti";
     piece.style.left = Math.random() * 100 + "vw";
     piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-    piece.style.animationDelay = Math.random() * .4 + "s";
+    piece.style.animationDelay = Math.random() * .45 + "s";
     piece.style.transform = `rotate(${Math.random() * 360}deg)`;
     confettiLayer.appendChild(piece);
 
     setTimeout(() => piece.remove(), 3200);
   }
 }
+
 async function fetchFacebook() {
   try {
     const response = await fetch("/api/facebook", { cache: "no-store" });
@@ -171,59 +191,54 @@ async function fetchFacebook() {
 
     if (!data.ok) throw new Error(data.message || "API indisponible");
 
-    $("status").textContent = "● En direct";
+    const followers = Number(data.followers || 0);
+
+    $("status").textContent = "● EN DIRECT";
     $("status").className = "status live";
 
-    const followers = Number(data.followers);
-   if (currentValue && followers > currentValue) {
-  celebrateNewFollower(followers - currentValue);
-}
+    if (currentValue && followers > currentValue) {
+      celebrateNewFollower(followers - currentValue);
+    }
 
-animateCounter(followers);
+    animateCounter(followers);
 
-    $("updatedAt").textContent = new Date(data.updatedAt).toLocaleTimeString("fr-FR", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    const today = Number(data.today || 0);
+    const week = Number(data.week || 0);
+    const history = Array.isArray(data.history) ? data.history : [];
+    const month = calculateMonth(history, followers);
 
-   const history = Array.isArray(data.history) ? data.history : [];
-displayDelta("todayDelta", Number(data.today || 0));
-displayDelta("weekDelta", Number(data.week || 0));
+    displayDelta("todayDelta", today);
+    displayDelta("weekDelta", week);
+    displayDelta("monthDelta", month);
 
     const percent = Math.min(Math.round((followers / GOAL) * 100), 100);
-    $("goalPercent").textContent = `${percent}%`;
-    $("goalBar").style.width = `${percent}%`;
+    const remaining = Math.max(GOAL - followers, 0);
+
+    $("goalPercentCircle").textContent = `${percent}%`;
+    $("remainingFollowers").textContent = formatNumber(remaining);
 
     drawChart(history);
+
   } catch (error) {
-    $("status").textContent = "● Hors ligne";
+    $("status").textContent = "● HORS LIGNE";
     $("status").className = "status offline";
-    $("updatedAt").textContent = "API indisponible";
-    const history = getHistory();
-    const last = history.at(-1)?.value || 0;
-    if (last) animateCounter(last);
-    drawChart(history);
+    console.error(error);
   }
 }
 
 setClock();
 setInterval(setClock, 1000);
+
 fetchFacebook();
 setInterval(fetchFacebook, REFRESH_MS);
+
 document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "t") {
+    celebrateNewFollower(1);
+    animateCounter(currentValue + 1);
 
-    if (e.key.toLowerCase() === "t") {
-
-        const ancien = currentValue;
-
-        animateCounter(currentValue + 1);
-
-        celebrateNewFollower(1);
-
-        setTimeout(() => {
-            animateCounter(ancien);
-        }, 5000);
-
-    }
-
+    setTimeout(() => {
+      animateCounter(currentValue);
+    }, 5000);
+  }
 });
