@@ -1,11 +1,3 @@
-  <div id="newFollowerToast" class="new-follower-toast">
-    🎉 Nouvel abonné !
-  </div>
-  <div id="confettiLayer"></div>
-
-  <script src="/script.js"></script>
-</body>
-</html>
 <!doctype html>
 <html lang="fr">
 <head>
@@ -15,65 +7,113 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <main class="screen">
-    <header class="topbar">
-      <div class="brand">
+  <main class="dashboard">
+
+    <header class="header">
+      <div class="identity">
         <img src="/assets/logo.png" alt="Logo Dojo Club">
         <div>
-          <h1>Dojo-club Vieux-Condé</h1>
-          <p>Compteur Facebook</p>
+          <h1>DOJO-CLUB<br><span>VIEUX-CONDÉ</span></h1>
+          <p>COMPTEUR FACEBOOK</p>
         </div>
       </div>
-      <div class="clock">
+
+      <div class="clock-card">
         <strong id="time">--:--:--</strong>
         <span id="date">Chargement...</span>
       </div>
+
+      <div class="live-card">
+        <strong>● EN DIRECT</strong>
+        <span>Mise à jour automatique<br>toutes les 5 minutes</span>
+      </div>
     </header>
 
-    <section class="hero">
-      <div class="halo"></div>
-      <div class="facebook-pill">● Facebook</div>
-      <div id="counter" class="counter">0</div>
-      <div class="label">abonnés</div>
+    <aside class="left-panel">
+      <div class="network-title">RÉSEAU</div>
+      <div class="facebook-orb">f</div>
+      <div class="facebook-label">FACEBOOK</div>
 
-      <div id="status" class="status offline">● Hors ligne</div>
-      <div class="updated">Mise à jour : <span id="updatedAt">--:--</span></div>
-
-      <div class="stats-row">
-        <article>
-          <span>Aujourd'hui</span>
-          <strong id="todayDelta">+0</strong>
-        </article>
-        <article>
-          <span>Cette semaine</span>
-          <strong id="weekDelta">+0</strong>
-        </article>
-        <article>
-          <span>Objectif 7 000</span>
-          <strong id="goalPercent">0%</strong>
-        </article>
+      <div class="goal-circle">
+        <span>OBJECTIF</span>
+        <strong>7 000</strong>
+        <div class="ring">
+          <div id="goalPercentCircle">0%</div>
+        </div>
+        <p>Il reste <b id="remainingFollowers">---</b> abonnés<br>pour atteindre l'objectif !</p>
       </div>
+    </aside>
 
-      <div class="goal"><div id="goalBar"></div></div>
+    <section class="main-counter">
+      <div class="energy"></div>
+      <div class="facebook-title">• FACEBOOK •</div>
+      <div id="counter" class="counter">0</div>
+      <div class="counter-label">ABONNÉS</div>
+      <div id="status" class="status offline">● HORS LIGNE</div>
     </section>
+
+    <aside class="right-panel">
+      <article class="stat-card cyan">
+        <div class="icon">▣</div>
+        <div>
+          <span>AUJOURD’HUI</span>
+          <strong id="todayDelta">+0</strong>
+          <small>vs hier</small>
+        </div>
+        <div class="mini-curve">⌁↗</div>
+      </article>
+
+      <article class="stat-card purple">
+        <div class="icon">▣</div>
+        <div>
+          <span>CETTE SEMAINE</span>
+          <strong id="weekDelta">+0</strong>
+          <small>vs semaine dernière</small>
+        </div>
+        <div class="mini-curve">⌁↗</div>
+      </article>
+
+      <article class="stat-card red">
+        <div class="icon">▣</div>
+        <div>
+          <span>CE MOIS</span>
+          <strong id="monthDelta">+0</strong>
+          <small>vs mois dernier</small>
+        </div>
+        <div class="mini-curve">⌁↗</div>
+      </article>
+
+      <article class="total-card">
+        <span>TOTAL ABONNÉS</span>
+        <strong id="totalFollowers">0</strong>
+        <small>● EN DIRECT</small>
+      </article>
+    </aside>
 
     <section class="chart-card">
-      <div class="chart-title">
-        <h2>Évolution des abonnés</h2>
-        <span>30 derniers jours</span>
+      <div class="chart-head">
+        <h2>ÉVOLUTION DES ABONNÉS <span>- 30 DERNIERS JOURS</span></h2>
+        <div class="tabs">
+          <button>7J</button>
+          <button class="active">30J</button>
+          <button>90J</button>
+          <button>1AN</button>
+        </div>
       </div>
-      <canvas id="chart" width="1400" height="260"></canvas>
+      <canvas id="chart" width="1400" height="320"></canvas>
     </section>
 
-    <footer>
-      <span>facebook.com/DojoClubVieuxConde</span>
-      <span>Actualisation automatique toutes les 5 minutes</span>
+    <footer class="footer">
+      <div class="footer-cta">🏆 Ensemble, atteignons <b>de nouveaux sommets !</b></div>
+      <div class="values">道 DISCIPLINE  |  礼 RESPECT  |  勇 COURAGE  |  謙 HUMILITÉ</div>
+      <div class="facebook-link">f facebook.com/DojoClubVieuxConde</div>
     </footer>
+
   </main>
+
+  <div id="newFollowerToast" class="new-follower-toast">🎉 Nouvel abonné !</div>
+  <div id="confettiLayer"></div>
+
   <script src="/script.js"></script>
 </body>
 </html>
-<div id="newFollowerToast" class="new-follower-toast">
-  🎉 Nouvel abonné !
-</div>
-<div id="confettiLayer"></div>
