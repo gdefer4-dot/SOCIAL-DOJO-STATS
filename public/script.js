@@ -205,7 +205,7 @@ async function fetchFacebook() {
     const today = Number(data.today || 0);
     const week = Number(data.week || 0);
     const history = Array.isArray(data.history) ? data.history : [];
-    const month = calculateMonth(history, followers);
+    const month = Number(data.month || 0);
 
     displayDelta("todayDelta", today);
     displayDelta("weekDelta", week);
