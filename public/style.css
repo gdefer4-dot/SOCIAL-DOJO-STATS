@@ -526,3 +526,58 @@ body.new-follower-flash::after {
   grid-column: 1 / 4;
   grid-row: 4 / 5;
 }
+/* CORRECTION CADRAGE BAS + TOTAL ABONNÉS */
+
+.dashboard {
+  grid-template-rows: 120px 1fr 250px 74px;
+  gap: 10px;
+}
+
+.chart-card {
+  grid-column: 2 / 3;
+  grid-row: 3 / 4;
+  padding: 14px 20px;
+  overflow: hidden;
+}
+
+canvas {
+  height: 180px;
+  margin-top: 4px;
+}
+
+.footer {
+  grid-column: 1 / 4;
+  grid-row: 4 / 5;
+  min-height: 70px;
+}
+
+.right-panel {
+  grid-column: 3 / 4;
+  grid-row: 2 / 4;
+  gap: 10px;
+}
+
+.total-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px 22px;
+  min-height: 120px;
+}
+
+.total-card span {
+  font-size: 15px;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.total-card strong {
+  font-size: 48px;
+  line-height: 1;
+  margin: 0;
+}
+
+.total-card small {
+  margin-top: 8px;
+}
