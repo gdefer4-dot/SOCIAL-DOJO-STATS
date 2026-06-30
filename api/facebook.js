@@ -14,28 +14,35 @@ async function getRedis() {
   return redisClient;
 }
 
-function getDateKey() {
+function dateKey(date = new Date()) {
   return new Intl.DateTimeFormat("fr-CA", {
     timeZone: "Europe/Paris",
     year: "numeric",
     month: "2-digit",
     day: "2-digit"
-  }).format(new Date());
+  }).format(date);
 }
 
-function getWeekKey() {
-  const now = new Date();
-  const parisDate = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Paris" }));
-  const day = parisDate.getDay();
+function mondayKey() {
+  const paris = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Paris" }));
+  const day = paris.getDay();
   const diff = day === 0 ? -6 : 1 - day;
-  parisDate.setDate(parisDate.getDate() + diff);
+  paris.setDate(paris.getDate() + diff);
+  return dateKey(paris);
+}
 
-  return new Intl.DateTimeFormat("fr-CA", {
-    timeZone: "Europe/Paris",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(parisDate);
+function monthKey() {
+  return dateKey().slice(0, 7) + "-01";
+}
+
+function sortHistory(rawHistory) {
+  return Object.entries(rawHistory)
+    .map(([date, value]) => ({ date, value: Number(value) }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function lastBefore(history, key) {
+  return [...history].reverse().find((item) => item.date < key);
 }
 
 export default async function handler(req, res) {
@@ -68,45 +75,48 @@ export default async function handler(req, res) {
 
     let today = 0;
     let week = 0;
-    let history = [{ date: getDateKey(), value: followers }];
+    let month = 0;
+    let history = [{ date: dateKey(), value: followers }];
 
-    try {
-      const redis = await getRedis();
+    const redis = await getRedis();
 
-      if (redis) {
-        const todayKey = getDateKey();
-        const weekKey = getWeekKey();
+    if (redis) {
+      const todayKey = dateKey();
+      const weekBaseKey = mondayKey();
+      const monthBaseKey = monthKey();
 
-        const todayStartKey = `facebook:start:day:${todayKey}`;
-        const weekStartKey = `facebook:start:week:${weekKey}`;
-        const historyKey = "facebook:history";
+      const historyKey = "facebook:history";
+      const weekStartKey = `facebook:start:week:${weekBaseKey}`;
+      const monthStartKey = `facebook:start:month:${monthBaseKey}`;
 
-        let todayStart = await redis.get(todayStartKey);
-        if (todayStart === null) {
-          todayStart = String(followers);
-          await redis.set(todayStartKey, todayStart);
-        }
+      const rawHistory = await redis.hGetAll(historyKey);
+      const previousHistory = sortHistory(rawHistory);
 
-        let weekStart = await redis.get(weekStartKey);
-        if (weekStart === null) {
-          weekStart = String(followers);
-          await redis.set(weekStartKey, weekStart);
-        }
+      const yesterdayValue = lastBefore(previousHistory, todayKey);
 
-        await redis.hSet(historyKey, todayKey, String(followers));
+      today = yesterdayValue ? followers - yesterdayValue.value : 0;
 
-        const rawHistory = await redis.hGetAll(historyKey);
-
-        history = Object.entries(rawHistory)
-          .map(([date, value]) => ({ date, value: Number(value) }))
-          .sort((a, b) => a.date.localeCompare(b.date))
-          .slice(-30);
-
-        today = followers - Number(todayStart);
-        week = followers - Number(weekStart);
+      let weekStart = await redis.get(weekStartKey);
+      if (weekStart === null) {
+        const beforeWeek = lastBefore(previousHistory, weekBaseKey);
+        weekStart = String(beforeWeek ? beforeWeek.value : followers);
+        await redis.set(weekStartKey, weekStart);
       }
-    } catch (redisError) {
-      console.error("Redis désactivé temporairement :", redisError.message);
+
+      let monthStart = await redis.get(monthStartKey);
+      if (monthStart === null) {
+        const beforeMonth = lastBefore(previousHistory, monthBaseKey);
+        monthStart = String(beforeMonth ? beforeMonth.value : followers);
+        await redis.set(monthStartKey, monthStart);
+      }
+
+      week = followers - Number(weekStart);
+      month = followers - Number(monthStart);
+
+      await redis.hSet(historyKey, todayKey, String(followers));
+
+      const updatedHistory = await redis.hGetAll(historyKey);
+      history = sortHistory(updatedHistory).slice(-30);
     }
 
     return res.status(200).json({
@@ -115,9 +125,11 @@ export default async function handler(req, res) {
       followers,
       today,
       week,
+      month,
       history,
       updatedAt: new Date().toISOString()
     });
+
   } catch (error) {
     return res.status(500).json({
       ok: false,
